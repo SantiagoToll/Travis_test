@@ -2,7 +2,7 @@
 
 BASE_URL=http://netstorage.unity3d.com/unity
 HASH=649f48bbbf0f
-VERSION=5.4.1f1
+VERSION=2018.2.19
 
 download() {
   file=$1
@@ -26,4 +26,10 @@ install() {
 install "MacEditorInstaller/Unity-$VERSION.pkg"
 install "MacEditorTargetInstaller/UnitySetup-Windows-Support-for-Editor-$VERSION.pkg"
 install "MacEditorTargetInstaller/UnitySetup-Mac-Support-for-Editor-$VERSION.pkg"
-install "MacEditorTargetInstaller/UnitySetup-Linux-Support-for-Editor-$VERSION.pkg"
+install "MacEditorTargetInstaller/UnitySetup-Linux-Support-for-Editor-$VERSION.pkg".3.0f1"
+
+echo 'Downloading from http://netstorage.unity3d.com/unity/3757309da7e7/MacEditorInstaller/Unity-5.2.2f1.pkg: '
+curl -o Unity.pkg http://netstorage.unity3d.com/unity/3757309da7e7/MacEditorInstaller/Unity-5.2.2f1.pkg
+
+echo 'Installing Unity.pkg'
+sudo installer -dumplog -package Unity.pkg -target /
