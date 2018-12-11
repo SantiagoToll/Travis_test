@@ -3,11 +3,11 @@ osx_image: xcode61
 rvm:
 - 2.1.2
 before_install:
-- chmod a+x ./Scripts/build.sh
+- chmod a+x ./build.sh
 install:
-- ./Scripts/install.sh
+- ./install.sh
 script:
-- ./Scripts/build.sh
+- ./build.sh
 deploy:
   provider: s3
   local-dir: Build
