@@ -1,57 +1,74 @@
 
 #! /bin/sh
 
-# NOTE the command args below make the assumption that your Unity project folder is
-#  a subdirectory of the repo root directory, e.g. for this repo "unity-ci-test" 
-#  the project folder is "UnityProject". If this is not true then adjust the 
-#  -projectPath argument to point to the right location.
+project="Travis_test"
 
-## Run the editor unit tests
-echo "Running editor unit tests for ${UNITYCI_PROJECT_NAME}"
+echo "Attempting to build $project for Windows"
 /Applications/Unity/Unity.app/Contents/MacOS/Unity \
-	-batchmode \
-	-nographics \
-	-silent-crashes \
-	-logFile $(pwd)/unity.log \
-	-projectPath ./Travis_test
-	-runEditorTests \
-	-editorTestsResultFile $(pwd)/test.xml \
-	-quit
+  -batchmode \
+  -nographics \
+  -silent-crashes \
+  -logFile $(pwd)/unity.log \
+  -projectPath $(pwd) \
+  -buildWindowsPlayer "$(pwd)/Build/windows/$project.exe" \
+  -quit
 
-rc0=$?
-echo "Unit test logs"
-cat $(pwd)/test.xml
-# exit if tests failed
-if [ $rc0 -ne 0 ]; then { echo "Failed unit tests"; exit $rc0; } fi
-
-## Make the builds
-# Recall from install.sh that a separate module was needed for Windows build support
-echo "Attempting build of ${UNITYCI_PROJECT_NAME} for Windows"
+echo "Attempting to build $project for OS X"
 /Applications/Unity/Unity.app/Contents/MacOS/Unity \
-	-batchmode \
-	-nographics \
-	-silent-crashes \
-	-logFile $(pwd)/unity.log \
-	-projectPath ./Travis_test
-	-buildWindowsPlayer "$(pwd)/Build/windows/${UNITYCI_PROJECT_NAME}.exe" \
-	-quit
+  -batchmode \
+  -nographics \
+  -silent-crashes \
+  -logFile $(pwd)/unity.log \
+  -projectPath $(pwd) \
+  -buildOSXUniversalPlayer "$(pwd)/Build/osx/$project.app" \
+  -quit
 
-rc1=$?
-echo "Build logs (Windows)"
-cat $(pwd)/unity.log
-
-echo "Attempting build of ${UNITYCI_PROJECT_NAME} for OSX"
+echo "Attempting to build $project for Linux"
 /Applications/Unity/Unity.app/Contents/MacOS/Unity \
-	-batchmode \
-	-nographics \
-	-silent-crashes \
-	-logFile $(pwd)/unity.log \
-	-projectPath ./Travis_test
-	-buildOSXUniversalPlayer "$(pwd)/Build/osx/${UNITYCI_PROJECT_NAME}.app" \
-	-quit
+  -batchmode \
+  -nographics \
+  -silent-crashes \
+  -logFile $(pwd)/unity.log \
+  -projectPath $(pwd) \
+  -buildLinuxUniversalPlayer "$(pwd)/Build/linux/$project.exe" \
+  -quit
 
-rc2=$?
-echo "Build logs (OSX)"
-cat $(pwd)/unity.log
+echo 'Logs from build'
+cat $(pwd)/unity.log#! /bin/bash
 
-exit $(($rc1|$rc2))
+build_dir=$(pwd)/build
+build_name=$build_dir/ci-build
+project_path=$(pwd)/Project
+log_file=$build_dir/unity.log
+
+mkdir -p $build_dir
+
+echo "Project Directory:"
+ls $project_path/Assets
+
+error_code=0
+
+echo "Building project."
+./Unity3D/Editor/Unity \
+  -batchmode \
+  -nographics \
+  -silent-crashes \
+  -force-free \
+  -logFile $log_file \
+  -projectPath $project_path \
+  -buildLinuxUniversalPlayer $build_name \
+  -quit
+
+if [ $? = 0 ] ; then
+  echo "Build completed successfully."
+  error_code=0
+else
+  echo "Building failed. Exited with $?."
+  error_code=1
+fi
+
+echo 'Build logs:'
+cat $log_file
+
+echo "Finishing with code $error_code"
+exit $error_code
