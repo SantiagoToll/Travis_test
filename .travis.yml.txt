@@ -1,18 +1,5 @@
 language: objective-c
-osx_image: xcode61
-rvm:
-- 2.1.2
-before_install:
-- chmod a+x ./build.sh
-install:
-- ./install.sh
-script:
-- ./build.sh
-deploy:
-  provider: s3
-  local-dir: Build
-  upload-dir: ci-build
-  skip_cleanup: true
-  acl: public_read
-  on:
-    repo: SantiagoToll/Travis_test
+sudo: false # faster builds
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
